@@ -14,6 +14,6 @@ Product.belongsTo(Category, {
   onDelete: "CASCADE",
 });
 
-Category.sync({ force: true });
-Product.sync({ force: true });
-Order.sync({ force: true });
+Category.sync();
+Product.sync();
+Order.sync();
