@@ -38,13 +38,14 @@ export const createOrder = async (req, res, next) => {
 
 export const updateOrder = async (req, res, next) => {
   try {
+    const { id } = req.params;
     const { products, total } = req.body;
     if (!products || !total) {
       throw new ErrorReponse("Products and total are required!", 400);
     }
     const order = await Order.findByPk(id);
     if (!order) throw new ErrorReponse("Order not found", 404);
-    const updatedOrder = await Order.update(req.body);
+    const updatedOrder = await order.update(req.body);
     res.status(200).json(updatedOrder);
   } catch (error) {
     next(error);

@@ -38,13 +38,14 @@ export const createCategory = async (req, res, next) => {
 
 export const updateCategory = async (req, res, next) => {
   try {
+    const { id } = req.params;
     const { name } = req.body;
     if (!name) {
       throw new ErrorReponse("Category name is required!", 400);
     }
     const category = await Category.findByPk(id);
     if (!category) throw new ErrorReponse("Category not found", 404);
-    const updatedCategory = await Category.update(req.body);
+    const updatedCategory = await category.update(req.body);
     res.status(200).json(updatedCategory);
   } catch (error) {
     next(error);
