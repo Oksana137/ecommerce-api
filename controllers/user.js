@@ -1,73 +1,72 @@
-//Get all users
+import User from "../models/User.js";
+import ErrorResponse from "../utils/ErrorResponse.js";
 
-const User = require("../models/User");
-
-const getUsers = async (req, res) => {
+// Get all users
+const getUsers = async (req, res, next) => {
   try {
     const users = await User.findAll();
     res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err); // Pass the error to the error-handling middleware
   }
 };
 
-//Post a new user
-const createUser = async (req, res) => {
+// Post a new user
+const createUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const newUser = await User.create({ name, email, password });
     res.status(201).json(newUser);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err); // Pass the error to the error-handling middleware
   }
 };
 
-//Get user by ID
-const getUserById = async (req, res) => {
+// Get user by ID
+const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id);
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ message: "User not found" });
+    if (!user) {
+      throw new ErrorResponse("User not found", 404); // Use ErrorResponse for missing users
     }
+    res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err); // Pass the error to the error-handling middleware
   }
 };
 
-//Put Update a user
-const updateUser = async (req, res) => {
+// Update a user
+const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, email } = req.body;
     const user = await User.findByPk(id);
-    if (user) {
-      user.name = name || user.name;
-      user.email = email || user.email;
-      await user.save();
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ message: "User not found" });
+    if (!user) {
+      throw new ErrorResponse("User not found", 404);
     }
+    user.name = name || user.name;
+    user.email = email || user.email;
+    await user.save();
+    res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 };
 
-//Delete a user
-const deleteUser = async (req, res) => {
+// Delete a user
+const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id);
-    if (user) {
-      await user.destroy();
-      res.status(200).json({ message: "User deleted successfully" });
-    } else {
-      res.status(404).json({ message: "User not found" });
+    if (!user) {
+      throw new ErrorResponse("User not found", 404);
     }
+    await user.destroy();
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err); // Pass the error to the error-handling middleware
   }
 };
+
+export { getUsers, createUser, getUserById, updateUser, deleteUser };
