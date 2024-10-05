@@ -14,8 +14,13 @@ export const getProducts = async (req, res, next) => {
 // Create a new product
 export const createProduct = async (req, res, next) => {
   try {
-    const { name, description, price } = req.body;
-    const newProduct = await Product.create({ name, description, price });
+    const { name, description, price, categoryId } = req.body;
+    const newProduct = await Product.create({
+      name,
+      description,
+      price,
+      categoryId,
+    });
     res.status(201).json(newProduct);
   } catch (err) {
     next(err);
@@ -40,7 +45,7 @@ export const getProductById = async (req, res, next) => {
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description, price } = req.body;
+    const { name, description, price, categoryId } = req.body;
     const product = await Product.findByPk(id);
     if (!product) {
       throw new ErrorResponse("Product not found", 404);
@@ -48,6 +53,7 @@ export const updateProduct = async (req, res, next) => {
     product.name = name || product.name;
     product.description = description || product.description;
     product.price = price || product.price;
+    product.categoryId = categoryId || product.categoryId;
     await product.save();
     res.status(200).json(product);
   } catch (err) {
